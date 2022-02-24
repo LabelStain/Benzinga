@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+<title> Thank You Benzinga!</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Audiowide|Sofia|Trirong|Mansalva|Courier Prime|Indie Flower|La Belle Aurore|Shadows Into Light|Turret Road">
     <meta charset="utf-8">
@@ -42,14 +43,19 @@ body {
                 Message: <input class="newMessage" value="Your text here" style="font-family: Courier Prime">
             </div>
             <button class="changeMessage">Donation Message</button>
+                <p>Network Name: cheapETH |
+New RPC URL: https://rpc.cheapeth.org/rpc |
+Chain ID: 777 |
+Currency Symbol: cTH</p>
         </div>
     </div>
+
 </body>
 
 <script type="text/javascript">
     const abi = [{"inputs": [], "name": "getMessage", "outputs": [{"internalType": "string", "name": "", "type": "string"}, {"internalType": "uint256", "name": "", "type": "uint256"}], "stateMutability": "view", "type": "function"}, {"inputs": [{"internalType": "string", "name": "newMessage", "type": "string"}], "name": "setNewMessage", "outputs": [], "stateMutability": "payable", "type": "function"}]
     const refreshMessageButton = document.querySelector('.refreshMessage');
-
+	const { chainId } = await provider.getNetwork();
     const changeMessageButton = document.querySelector('.changeMessage');
     const valueInput = document.querySelector('.value');
     const messageInput = document.querySelector('.newMessage');
