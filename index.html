@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Audiowide|Sofia|Trirong|Mansalva|Courier Prime">
+    <meta charset="utf-8">
+    <script type="text/javascript" src="https://cdn.ethers.io/lib/ethers-5.0.umd.min.js"></script>
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+ 
+       <style>
+body {
+  font-family: "Courier Prime";
+}
+</style>
+      
+</head>
+
+<body style="text-align: center;">
+    <div style="padding-top: 5%;">
+        <h2 style="">Top Benzinga Donator</h2>
+        <h3 style="font-family: Mansalva" class="message"></h3>
+        <h4>
+            Top Donation:
+            <span class="price"></span>
+        </h4>
+        <button class="refreshMessage">Refresh Donation Message</button>
+    </div>
+<div style="position: fixed; left: 0; bottom: 20rem; width: 100%;">
+    
+<lottie-player src="https://assets8.lottiefiles.com/packages/lf20_2omr5gpu.json"  background="transparent"  speed=".75"  style="width: 150px; height: 150px; display:block; margin-left: auto; margin-right: auto"  loop autoplay></lottie-player>
+</div>
+    <div style="position: fixed; left: 0; bottom: 20px; width: 100%;">
+
+        <h2 style="font-family: Mansalva">This App Was built 2/23/22 for the Benzinga Team</h2>
+        <h3>Set new message by sending more cTH than the previous person</h3>
+        <div>
+            <div style="padding-bottom: 10px" style="font-family: Courier Prime">
+                cTH amount: <input class="value" value="1.0" style="font-family: Courier Prime">
+            </div>
+            <div style="padding-bottom: 10px">
+                Message: <input class="newMessage" value="Your text here" style="font-family: Courier Prime">
+            </div>
+            <button class="changeMessage">Donation Message</button>
+        </div>
+    </div>
+</body>
+
+<script type="text/javascript">
+    const abi = [{"inputs": [], "name": "getMessage", "outputs": [{"internalType": "string", "name": "", "type": "string"}, {"internalType": "uint256", "name": "", "type": "uint256"}], "stateMutability": "view", "type": "function"}, {"inputs": [{"internalType": "string", "name": "newMessage", "type": "string"}], "name": "setNewMessage", "outputs": [], "stateMutability": "payable", "type": "function"}]
+    const refreshMessageButton = document.querySelector('.refreshMessage');
+
+    const changeMessageButton = document.querySelector('.changeMessage');
+    const valueInput = document.querySelector('.value');
+    const messageInput = document.querySelector('.newMessage');
+
+    const showAccount = document.querySelector('.account');
+    const waitingForMetamask = document.querySelector('.waiting');
+    const message = document.querySelector('.message');
+    const price = document.querySelector('.price');
+
+    // Smart Contract stuff
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
+    const daiAddress = "0x346b545F5A319c3a8D983C78FD6310231f6ac71F";
+    const daiContract = new ethers.Contract(daiAddress, abi, provider);
+    refreshMessageButton.addEventListener('click', () => {
+        getMessage();
+    });
+    function getMessage() {
+        daiContract.getMessage().then(
+            function(value) {
+                message.textContent = sanitize(value[0]);
+                price.textContent = ethers.utils.formatEther(value[1]);
+             },
+            function(error) { 
+                message.textContent = ("Failed to fetch message: " + error);
+            }
+        );
+    }
+    getMessage();
+
+    changeMessageButton.addEventListener('click', () => {
+        updateMessage();
+    });
+    function updateMessage() {
+        window.ethereum.enable().then(
+            function(value) {
+                var daiWithSigner = daiContract.connect(signer);
+                var overrides = {
+                    // To convert Ether to Wei:
+                    value: ethers.utils.parseEther(valueInput.value)
+                };
+                daiWithSigner.setNewMessage(messageInput.value, overrides).then(
+                    function(value) {
+                        alert('Message set!');
+                        getMessage();
+                    },
+                    function(error) { 
+                        alert('Failed to set message: ' + error.message);
+                    }
+                );
+            },
+            function(error) { 
+                alert('Failed connect to Metamask: ' + error.message);
+            }
+        );
+
+    }
+
+    // Misc
+    function sanitize(string) {
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#x27;',
+            "/": '&#x2F;',
+        };
+        const reg = /[&<>"'/]/ig;
+        return string.replace(reg, (match)=>(map[match]));
+    }
+</script>
+</html>
